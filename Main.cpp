@@ -47,7 +47,7 @@ void displayGrid(SDL_Window *win, SDL_Renderer *renderer, Matrix matrix) {
 // A 2 means it is guaranteed to survive the next
 // 0,0,1,2,0,... means if the cell has 2-3 neighbors it survives, <2 or >4 means it dies, and 3 neighbors means a new cell gets born
 Rules RULES = Rules(
-    0,1,2,0,0,0,0,0,0
+    0,0,1,2,0,0,0,0,0
 );
 
 void update(Matrix &mat) {
@@ -62,7 +62,7 @@ void update(Matrix &mat) {
 
 int main() {
     SDL_Init(SDL_INIT_EVERYTHING);
-    SDL_Window* win = SDL_CreateWindow("my window", 100, 100, WINSIZE_X,WINSIZE_Y, SDL_WINDOW_SHOWN);
+    SDL_Window* win = SDL_CreateWindow("COnways Game Of Life", 100, 100, WINSIZE_X,WINSIZE_Y, SDL_WINDOW_SHOWN);
 
     if (!win) {
         std :: cout << "Failed to create a window! Error: " << SDL_GetError() << "\n";
@@ -147,7 +147,6 @@ int main() {
         displayGrid(win,renderer,mat);
         SDL_RenderPresent(renderer);
         SDL_Delay(1);
-        std::cout << "a\n";
     }
 
     SDL_DestroyWindow(win);
