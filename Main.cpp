@@ -6,16 +6,17 @@
 #include "Matrix.h"
 #include "Rules.h"
 
+#define CELL_LENGTH_X 500
+#define CELL_LENGTH_Y 500
 
-int CELL_LENGTH_X = 500;
-int CELL_LENGTH_Y = 500;
+#define WINSIZE_X 1000
+#define WINSIZE_Y 800
+#define SPEED 10;
 
-int WINSIZE_X = 1000; int WINSIZE_Y = 800;
-int SPEED = 10;
+#define CELL_MARGIN 1
+#define CELL_SIZE 10
 
 int xOffset = 0; int yOffset = 0;
-int cell_margin = 1; int cell_size = 10;
-int size = 0;
 
 int subSecCounter = 0; int maxSecCounter = 1;
 bool mouseDown = false;
@@ -25,11 +26,11 @@ int currentModifyingY = 0;
 bool spacePressToggle = false;
 
 void displayGrid(SDL_Window *win, SDL_Renderer *renderer, Matrix matrix) {
-    SDL_Rect rect = {5,5,cell_size,cell_size};
+    SDL_Rect rect = {5,5,CELL_SIZE,CELL_SIZE};
     for (int y = 0; y<CELL_LENGTH_Y; y++) {
         for (int x = 0; x<CELL_LENGTH_X; x++) {
-            rect.x = x * (cell_size+cell_margin) + xOffset;
-            rect.y = y * (cell_size+cell_margin) + yOffset;
+            rect.x = x * (CELL_SIZE+CELL_MARGIN) + xOffset;
+            rect.y = y * (CELL_SIZE+CELL_MARGIN) + yOffset;
             if (matrix.get(x,y) == 0) {
                 SDL_SetRenderDrawColor(renderer,100,100,100,255);
                 SDL_RenderFillRect(renderer,&rect);
@@ -41,8 +42,13 @@ void displayGrid(SDL_Window *win, SDL_Renderer *renderer, Matrix matrix) {
     }
 }
 
-// key = #neighbors; value = state: 0 = tot; 1 = nichts passiert; 2 = leben
-Rules RULES = Rules();
+// A 0 means the cell dies in the next generation
+// A 1 means it survives if it is currently alive
+// A 2 means it is guaranteed to survive the next
+// 0,0,1,2,0,... means if the cell has 2-3 neighbors it survives, <2 or >4 means it dies, and 3 neighbors means a new cell gets born
+Rules RULES = Rules(
+    0,1,2,0,0,0,0,0,0
+);
 
 void update(Matrix &mat) {
     Matrix matB = mat;
@@ -57,16 +63,6 @@ void update(Matrix &mat) {
 int main() {
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_Window* win = SDL_CreateWindow("my window", 100, 100, WINSIZE_X,WINSIZE_Y, SDL_WINDOW_SHOWN);
-
-    RULES.changeRule(0,0);
-    RULES.changeRule(1,0);
-    RULES.changeRule(2,1);
-    RULES.changeRule(3,2);
-    RULES.changeRule(4,0);
-    RULES.changeRule(5,0);
-    RULES.changeRule(6,0);
-    RULES.changeRule(7,0);
-    RULES.changeRule(8,0);
 
     if (!win) {
         std :: cout << "Failed to create a window! Error: " << SDL_GetError() << "\n";
@@ -113,17 +109,13 @@ int main() {
                         subSecCounter = maxSecCounter;
                     }
                 }
-
-                if (event.key.keysym.sym == SDLK_u) {
-                    update(mat);
-                }
             }
         }
 
         if (mouseDown) {
             SDL_GetMouseState(&xMouse,&yMouse);
-            int x = (xMouse - xOffset) / (cell_size+cell_margin);
-            int y = (yMouse - yOffset) / (cell_size+cell_margin);
+            int x = (xMouse - xOffset) / (CELL_SIZE+CELL_MARGIN);
+            int y = (yMouse - yOffset) / (CELL_SIZE+CELL_MARGIN);
             if (!(currentModifyingX == x && currentModifyingY == y)) {
                 mat.set(x,y,!mat.get(x,y));
 
@@ -139,14 +131,8 @@ int main() {
 
         xOffset += (state[SDL_SCANCODE_LEFT] - state[SDL_SCANCODE_RIGHT]) * SPEED;
         yOffset += (state[SDL_SCANCODE_UP] - state[SDL_SCANCODE_DOWN]) * SPEED;
-        cell_margin += (state[SDL_SCANCODE_U] - state[SDL_SCANCODE_J]) * 5;
-        if (cell_margin < 0) {
-            cell_margin = 0;
-        }
-        cell_size += (state[SDL_SCANCODE_I] - state[SDL_SCANCODE_K]) * 5;
-        if (cell_size < 1) {
-            cell_size = 1;
-        } if (subSecCounter == 0) {
+
+        if (subSecCounter == 0) {
             update(mat);
             subSecCounter = maxSecCounter;
         }
@@ -154,7 +140,7 @@ int main() {
         if (!spacePressToggle) {
             subSecCounter-=1;
         }
-        //SDL_FillRect(winSurface, NULL, SDL_MapRGB(winSurface->format, 255, 255, 255));
+
         SDL_SetRenderDrawColor(renderer,0,0,0,255);
         SDL_RenderClear(renderer);
 
