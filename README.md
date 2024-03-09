@@ -1,14 +1,20 @@
-# ConwaysGameOfLife
-#### An implementation of the classic cellular automata in C++
+# Conways Game Of Life
 
-## Prerequisites
-    SDL2
-    CMake
-#### 
+An implementation of the classic cellular automata in C++
+### Prerequisites
 
-## Controls
-    Space to pauses the simulation
-    Arrow Keys to move (Will lag, don't know why)
-    
+```
+SDL2
+CMake
+```
 
-The rules are changeable
+### Controls
+
+```
+Space to pauses the simulation
+Arrow Keys to move (Will lag, don't know why)
+```
+
+## Acknowledgments
+
+* I built this for an internship
