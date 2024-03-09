@@ -1,5 +1,5 @@
 # ConwaysGameOfLife
-#### A implementation of the classic cellular automata in C++
+#### An implementation of the classic cellular automata in C++
 
 ## Prerequisites
     SDL2
